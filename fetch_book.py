@@ -3,8 +3,41 @@ from libgen_api import LibgenSearch
 import requests
 import sys
 from loguru import logger
+import io
+from typing import Union
+import PyPDF2
 
 searcher = LibgenSearch()
+
+def get_text_from_pdf(pdf_str: Union[str, bytes]) -> str:
+    """
+    Extract text from PDF content.
+    
+    Args:
+        pdf_str: Raw PDF content as bytes or string
+        
+    Returns:
+        Extracted text as string
+    """
+    # Ensure we have bytes
+    if isinstance(pdf_str, str):
+        pdf_bytes = pdf_str.encode('utf-8')
+    else:
+        pdf_bytes = pdf_str
+    
+    # Create a file-like object
+    pdf_file = io.BytesIO(pdf_bytes)
+    
+    # Create PDF reader
+    pdf_reader = PyPDF2.PdfReader(pdf_file)
+    
+    # Extract text from all pages
+    text = ""
+    for page in pdf_reader.pages:
+        text += page.extract_text() + "\n"
+    
+    return text
+
 
 def get_book_title_author(title: str, author: str) -> Any:
     logger.info(f"Downloading {title} | by {author}")
@@ -34,8 +67,13 @@ def get_book_title_author(title: str, author: str) -> Any:
     response = requests.get(download_link)
     logger.info(f"length of book: {len(response.content)}")
 
+    book_text = get_text_from_pdf(response.content)
+    logger.info(f"length of book text: {len(book_text)}")
+
+    return book_text
+
+
 if __name__ == "__main__":
-    # Initialize loguru when run as standalone script
     logger.remove()
     logger.configure(handlers=[{"sink": sys.stderr, "level": "INFO"}])
     logger.info("Running fetch_book.py as standalone script")

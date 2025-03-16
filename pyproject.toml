@@ -9,4 +9,5 @@ dependencies = [
     "libgen-api>=1.0.1",
     "loguru>=0.7.3",
     "mcp[cli]>=1.4.1",
+    "pypdf2>=3.0.1",
 ]

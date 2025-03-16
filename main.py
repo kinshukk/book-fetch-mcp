@@ -8,4 +8,6 @@ from loguru import logger
 logger.remove()
 logger.configure(handlers=[{"sink": sys.stderr, "level": "INFO"}])
 
+
+
 mcp = FastMCP("book-fetcher")
