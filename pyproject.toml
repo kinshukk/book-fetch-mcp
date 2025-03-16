@@ -7,5 +7,6 @@ requires-python = ">=3.13"
 dependencies = [
     "httpx>=0.28.1",
     "libgen-api>=1.0.1",
+    "loguru>=0.7.3",
     "mcp[cli]>=1.4.1",
 ]
