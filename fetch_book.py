@@ -9,7 +9,7 @@ import PyPDF2
 
 searcher = LibgenSearch()
 
-def get_text_from_pdf(pdf_str: Union[str, bytes]) -> str:
+async def get_text_from_pdf(pdf_str: Union[str, bytes]) -> str:
     """
     Extract text from PDF content.
     
@@ -39,7 +39,7 @@ def get_text_from_pdf(pdf_str: Union[str, bytes]) -> str:
     return text
 
 
-def get_book_title_author(title: str, author: str) -> Any:
+async def get_book_text(title: str, author: str) -> Any:
     logger.info(f"Downloading {title} | by {author}")
     title_filter = {"Extension": "pdf"}
     results = searcher.search_title_filtered(
@@ -50,7 +50,7 @@ def get_book_title_author(title: str, author: str) -> Any:
     logger.debug(f"results: {results}")
 
     if len(results) == 0:
-        return f"No results for {title}\n"
+        return f"No results for {title} | {author} . Maybe there's a typo?\n"
     else:
         logger.debug(str(results))
 
@@ -67,7 +67,7 @@ def get_book_title_author(title: str, author: str) -> Any:
     response = requests.get(download_link)
     logger.info(f"length of book: {len(response.content)}")
 
-    book_text = get_text_from_pdf(response.content)
+    book_text = await get_text_from_pdf(response.content)
     logger.info(f"length of book text: {len(book_text)}")
 
     return book_text
@@ -77,5 +77,7 @@ if __name__ == "__main__":
     logger.remove()
     logger.configure(handlers=[{"sink": sys.stderr, "level": "INFO"}])
     logger.info("Running fetch_book.py as standalone script")
-        
-    get_book_title_author("The Art of War", "Sun Tzu")
+    
+    import asyncio
+    asyncio.run(get_book_title_author("The Art of War", "Sun Tzu"))
+    logger.info("Done")
